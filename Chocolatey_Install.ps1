@@ -16,6 +16,10 @@ $config_core_pkgs = @()
 $config_gui_pkgs = $config_core_pkgs + @('chocolateygui')
 $config_dev_pkgs = $config_gui_pkgs + @('ripgrep', 'dotnet-6.0-sdk', 'git', 'gitkraken', 'visualstudio2022community', 'sql-server-management-studio', 'vscode', 'postman')
 $config_full_pkgs = $config_dev_pkgs + @('adobereader', 'googledrive', 'lightshot', 'vlc', 'winrar', 'spotify', 'teamspeak', 'discord', 'steam-client', 'whatsapp')
+
+$path_folder = "C:\path"
+$ripgrep_bat = "ripg.bat"
+$ripgrep_bat_full_path = $path_folder + "\" + $ripgrep_bat
 #endregion
 
 #region Functions
@@ -95,8 +99,30 @@ elseif ($installation_type -eq "full") {
     }
 }
 
-# TODO: system vars (for ripgrep)
 
-# TODO: create ripgrep bat
+# Ripgrep default config
+do{
+    $ripgrep_config = Read-Host -Prompt 'Do you want create default config for ripgrep [y/n]?'
+    $ripgrep_config = $ripgrep_config.ToLower()
+} 
+while (-not (($ripgrep_config -eq "y") -or ($ripgrep_config -eq "n")))
+
+
+if ($ripgrep_config -eq "y"){
+    Write-Host "Creating default config..."
+
+    New-Item $path_folder -itemType Directory
+    New-Item $ripgrep_bat_full_path
+    Set-Content $ripgrep_bat_full_path '@echo off
+rg -i -B 4 -A 5 -U --glob-case-insensitive %*'
+
+    Write-Host "Setting system variable..."
+
+    if (-not $Env:PATH.Split(";").Contains($path_folder)){
+        $path_append = ";" + $path_folder
+        [Environment]::SetEnvironmentVariable("PATH", $Env:PATH + $path_append, [EnvironmentVariableTarget]::Machine)
+    }
+
+}
 
 Pause
