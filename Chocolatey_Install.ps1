@@ -49,6 +49,7 @@ function ShowHelp{
     Write-Host "chocolatey"
     $config_dev_pkgs
     Write-Host ""
+    
     Write-Host "Full - installs:" -ForegroundColor Green
     Write-Host "====================================" -ForegroundColor Green
     Write-Host "chocolatey"
