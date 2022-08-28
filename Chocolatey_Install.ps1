@@ -20,6 +20,8 @@ $config_full_pkgs = $config_dev_pkgs + @('adobereader', 'googledrive', 'lightsho
 $path_folder = "C:\path"
 $ripgrep_bat = "ripg.bat"
 $ripgrep_bat_full_path = $path_folder + "\" + $ripgrep_bat
+$ripgrep_bat_content = '@echo off
+    rg -i -B 4 -A 5 -U --glob-case-insensitive %*'
 #endregion
 
 #region Functions
@@ -65,7 +67,7 @@ function ShowHelp{
 
 
 do {
-    $installation_type = Read-Host -Prompt 'Enter installation type [core, gui, dev, full] ("?" for help)'
+    $installation_type = $(Write-Host 'Enter installation type' -NoNewline) + $(Write-Host $(' [' + $($configs -join ', ') + ']') -ForegroundColor Yellow -NoNewLine) + $(Write-Host ' ("?" for help): ' -ForegroundColor Green -NoNewLine; Read-Host)
     $installation_type = $installation_type.ToLower()
 
     if ($installation_type -eq "?"){
@@ -99,30 +101,32 @@ elseif ($installation_type -eq "full") {
     }
 }
 
-
+<# TODO: verify rg install #>
 # Ripgrep default config
 do{
-    $ripgrep_config = Read-Host -Prompt 'Do you want create default config for ripgrep [y/n]?'
+    $ripgrep_config = $(Write-Host) + $(Write-Host "Do you want create default config for ripgrep?" -NoNewline) + $(Write-Host " [y/n]: " -ForegroundColor Yellow -NoNewLine; Read-Host)
     $ripgrep_config = $ripgrep_config.ToLower()
 } 
 while (-not (($ripgrep_config -eq "y") -or ($ripgrep_config -eq "n")))
 
 
 if ($ripgrep_config -eq "y"){
-    Write-Host "Creating default config..."
+    Write-Host "Creating default config [$ripgrep_bat_full_path]" -ForegroundColor Gray
 
     New-Item $path_folder -itemType Directory
     New-Item $ripgrep_bat_full_path
-    Set-Content $ripgrep_bat_full_path '@echo off
-rg -i -B 4 -A 5 -U --glob-case-insensitive %*'
 
-    Write-Host "Setting system variable..."
+    Write-Host $(Write-Host "Config:" -ForegroundColor Gray) + $(Write-Host $ripgrep_bat_content -ForegroundColor Magenta; Write-Host "")
+
+    Set-Content $ripgrep_bat_full_path $ripgrep_bat_content
+
+    Write-Host "Setting system variable [PATH]" -ForegroundColor Gray
 
     if (-not $Env:PATH.Split(";").Contains($path_folder)){
         $path_append = ";" + $path_folder
         [Environment]::SetEnvironmentVariable("PATH", $Env:PATH + $path_append, [EnvironmentVariableTarget]::Machine)
     }
-
 }
 
+Write-Host
 Pause
