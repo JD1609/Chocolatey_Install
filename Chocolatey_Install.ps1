@@ -38,6 +38,16 @@ function InstallPackage {
     choco install $pkg
 }
 
+function VerifyRgInstalled {
+    $choco_installed_pkgs = choco list --local-only
+
+    foreach ($pkg in $choco_installed_pkgs) {
+        if ($pkg.ToString().StartsWith("ripgrep") -eq $true){
+            return $true
+        }
+    }
+}
+
 function ShowHelp{
     Write-Host "Core - installs:" -ForegroundColor Green
     Write-Host "====================================" -ForegroundColor Green
@@ -61,6 +71,10 @@ function ShowHelp{
     Write-Host "chocolatey"
     $config_full_pkgs
     Write-Host ""
+}
+
+function Done {
+    Write-Host $(Write-Host; Write-Host "=== Done ===" -Foreground Green; Write-Host; Pause)
 }
 
 #endregion
@@ -101,32 +115,35 @@ elseif ($installation_type -eq "full") {
     }
 }
 
-<# TODO: verify rg install #>
+
 # Ripgrep default config
-do{
-    $ripgrep_config = $(Write-Host) + $(Write-Host "Do you want create default config for ripgrep?" -NoNewline) + $(Write-Host " [y/n]: " -ForegroundColor Yellow -NoNewLine; Read-Host)
-    $ripgrep_config = $ripgrep_config.ToLower()
-} 
-while (-not (($ripgrep_config -eq "y") -or ($ripgrep_config -eq "n")))
+if (VerifyRgInstalled){
+
+    do{
+        $ripgrep_config = $(Write-Host) + $(Write-Host "Do you want create default config for ripgrep?" -NoNewline) + $(Write-Host " [y/n]: " -ForegroundColor Yellow -NoNewLine; Read-Host)
+        $ripgrep_config = $ripgrep_config.ToLower()
+    } 
+    while (-not (($ripgrep_config -eq "y") -or ($ripgrep_config -eq "n")))
 
 
-if ($ripgrep_config -eq "y"){
-    Write-Host "Creating default config [$ripgrep_bat_full_path]" -ForegroundColor Gray
+    if ($ripgrep_config -eq "y"){
+        Write-Host "Creating default config [$ripgrep_bat_full_path]" -ForegroundColor Gray
 
-    New-Item $path_folder -itemType Directory
-    New-Item $ripgrep_bat_full_path
+        New-Item $path_folder -itemType Directory
+        New-Item $ripgrep_bat_full_path
 
-    Write-Host $(Write-Host "Config:" -ForegroundColor Gray) + $(Write-Host $ripgrep_bat_content -ForegroundColor Magenta; Write-Host "")
+        Write-Host $(Write-Host "Config:" -ForegroundColor Gray) + $(Write-Host $ripgrep_bat_content -ForegroundColor Magenta; Write-Host "")
 
-    Set-Content $ripgrep_bat_full_path $ripgrep_bat_content
+        Set-Content $ripgrep_bat_full_path $ripgrep_bat_content
 
-    Write-Host "Setting system variable [PATH]" -ForegroundColor Gray
+        Write-Host "Setting system variable [PATH]" -ForegroundColor Gray
 
-    if (-not $Env:PATH.Split(";").Contains($path_folder)){
-        $path_append = ";" + $path_folder
-        [Environment]::SetEnvironmentVariable("PATH", $Env:PATH + $path_append, [EnvironmentVariableTarget]::Machine)
+        if (-not $Env:PATH.Split(";").Contains($path_folder)){
+            $path_append = ";" + $path_folder
+            [Environment]::SetEnvironmentVariable("PATH", $Env:PATH + $path_append, [EnvironmentVariableTarget]::Machine)
+        }
     }
 }
 
-Write-Host
-Pause
+
+Done
