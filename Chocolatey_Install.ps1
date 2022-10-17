@@ -35,7 +35,7 @@ function InstallCore { # Install chocolatey
 function InstallPackage {
     param ($pkg)
     
-    choco install $pkg
+    choco install $pkg -y
 }
 
 function VerifyRgInstalled {
