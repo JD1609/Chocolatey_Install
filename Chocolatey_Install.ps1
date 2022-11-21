@@ -125,19 +125,25 @@ function CreateTempCmdVariable {
 
 function EnableSSMSDarkMode {
     
+    # TODO: make version non-dependend
     $filePath = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 18\Common7\IDE\ssms.pkgundef"
     $themeKey = '[$RootKey$\Themes\{1ded0138-47ce-435e-84ef-9ec1f439b749}]'
     $fileExists = Test-Path -Path $filePath -PathType Leaf
 
     if ($fileExists){
+        Write-Host "Enabling SSMS dark mode..." -ForegroundColor Gray
         (Get-Content $filePath).Replace($themeKey, "// $themeKey") | Out-File $filePath
     }
 }
 
 function SetNasAlias {
     
+    $ip = "192.168.0.194"
+    $alias = "nas.local"
+    Write-Host "Setting '$alias' alias for NAS [$ip]..." -ForegroundColor Gray
+
     $file = Get-Content -Path C:\Windows\System32\Drivers\etc\hosts
-    $value = "192.168.0.194		nas.local"
+    $value = "$ip		$alias"
     $contains = $false
 
     foreach ($row in $file) {
@@ -154,8 +160,12 @@ function SetNasAlias {
 
 function SetWifiAlias {
     
+    $ip = "192.168.1.1"
+    $alias = "wifi.local"
+    Write-Host "Setting '$alias' alias for local wifi router [$ip]..." -ForegroundColor Gray
+
     $file = Get-Content -Path C:\Windows\System32\Drivers\etc\hosts
-    $value = "192.168.1.1			wifi.local"
+    $value = "$ip			$alias"
     $contains = $false
 
     foreach ($row in $file) {
