@@ -50,6 +50,17 @@ function VerifyRgInstalled {
     return $false
 }
 
+function EnableSSMSDarkMode {
+    
+    $filePath = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 18\Common7\IDE\ssms.pkgundef"
+    $themeKey = '[$RootKey$\Themes\{1ded0138-47ce-435e-84ef-9ec1f439b749}]'
+    $fileExists = Test-Path -Path $filePath -PathType Leaf
+
+    if ($fileExists){
+        (Get-Content $filePath).Replace($themeKey, "// $themeKey") | Out-File $filePath
+    }
+}
+
 function SetNasAlias {
     
     $file = Get-Content -Path C:\Windows\System32\Drivers\etc\hosts
@@ -153,7 +164,6 @@ elseif ($installation_type -eq "full") {
     }
 }
 
-
 # Ripgrep default config
 if (VerifyRgInstalled){
 
@@ -183,9 +193,14 @@ if (VerifyRgInstalled){
     }
 }
 
+
 # Hosts file
 SetNasAlias
 SetWifiAlias
 
+# SSMS settings
+EnableSSMSDarkMode
 
+
+# ================ DONE ================
 Done
