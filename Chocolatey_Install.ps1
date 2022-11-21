@@ -24,7 +24,23 @@ $ripgrep_bat_content = '@echo off
     rg -i -B 4 -A 5 -U --glob-case-insensitive %*'
 #endregion
 
+
 #region Functions
+function CreatePathFolder {
+
+    $exists = Test-Path -Path $path_folder
+
+    if (-not $exists){
+        Write-Host "Creating path folder [$path_folder]" -ForegroundColor Gray
+        New-Item $path_folder -itemType Directory
+    }
+
+    if (-not $Env:PATH.Split(";").Contains($path_folder)){
+        Write-Host "Setting system variable [PATH]" -ForegroundColor Gray
+        $path_append = ";" + $path_folder
+        [Environment]::SetEnvironmentVariable("PATH", $Env:PATH + $path_append, [EnvironmentVariableTarget]::Machine)
+    }
+}
 
 function InstallCore { # Install chocolatey
     Set-ExecutionPolicy Bypass -Scope Process -Force; 
@@ -38,6 +54,28 @@ function InstallPackage {
     choco install $pkg -y
 }
 
+function InstallPackages {
+    param ($installation_type)
+    
+    if ($installation_type -eq "core"){
+    }
+    elseif ($installation_type -eq "gui") {
+        foreach ($pkg in $config_gui_pkgs) {
+            InstallPackage($pkg)
+        }
+    }
+    elseif ($installation_type -eq "dev") {
+        foreach ($pkg in $config_dev_pkgs) {
+            InstallPackage($pkg)
+        }
+    }
+    elseif ($installation_type -eq "full") {
+        foreach ($pkg in $config_full_pkgs) {
+            InstallPackage($pkg)
+        }
+    }
+}
+
 function VerifyRgInstalled {
     $choco_installed_pkgs = choco list --local-only
 
@@ -48,6 +86,18 @@ function VerifyRgInstalled {
     }
 
     return $false
+}
+
+function CreateRipGrepConfig {
+    
+    CreatePathFolder
+        
+    Write-Host "Creating default config [$ripgrep_bat_full_path]" -ForegroundColor Gray
+    New-Item $ripgrep_bat_full_path
+    
+    Write-Host $(Write-Host "Config:" -ForegroundColor Gray) + $(Write-Host $ripgrep_bat_content -ForegroundColor Magenta; Write-Host "")
+    
+    Set-Content $ripgrep_bat_full_path $ripgrep_bat_content
 }
 
 function EnableSSMSDarkMode {
@@ -125,10 +175,10 @@ function ShowHelp{
 function Done {
     Write-Host $(Write-Host; Write-Host "=== Done ===" -Foreground Green; Write-Host; Pause)
 }
-
 #endregion
 
 
+# Instalation type
 do {
     $installation_type = $(Write-Host 'Enter installation type' -NoNewline) + $(Write-Host $(' [' + $($configs -join ', ') + ']') -ForegroundColor Yellow -NoNewLine) + $(Write-Host ' ("?" for help): ' -ForegroundColor Green -NoNewLine; Read-Host)
     $installation_type = $installation_type.ToLower()
@@ -140,29 +190,11 @@ do {
 while (-not $configs.Contains($installation_type))
 
 
-
 # Install chocolatey
 InstallCore
 
-
 # Install packages
-if ($installation_type -eq "core"){
-}
-elseif ($installation_type -eq "gui") {
-    foreach ($pkg in $config_gui_pkgs) {
-        InstallPackage($pkg)
-    }
-}
-elseif ($installation_type -eq "dev") {
-    foreach ($pkg in $config_dev_pkgs) {
-        InstallPackage($pkg)
-    }
-}
-elseif ($installation_type -eq "full") {
-    foreach ($pkg in $config_full_pkgs) {
-        InstallPackage($pkg)
-    }
-}
+InstallPackages($installation_type)
 
 # Ripgrep default config
 if (VerifyRgInstalled){
@@ -175,21 +207,7 @@ if (VerifyRgInstalled){
 
 
     if ($ripgrep_config -eq "y"){
-        Write-Host "Creating default config [$ripgrep_bat_full_path]" -ForegroundColor Gray
-
-        New-Item $path_folder -itemType Directory
-        New-Item $ripgrep_bat_full_path
-
-        Write-Host $(Write-Host "Config:" -ForegroundColor Gray) + $(Write-Host $ripgrep_bat_content -ForegroundColor Magenta; Write-Host "")
-
-        Set-Content $ripgrep_bat_full_path $ripgrep_bat_content
-
-        Write-Host "Setting system variable [PATH]" -ForegroundColor Gray
-
-        if (-not $Env:PATH.Split(";").Contains($path_folder)){
-            $path_append = ";" + $path_folder
-            [Environment]::SetEnvironmentVariable("PATH", $Env:PATH + $path_append, [EnvironmentVariableTarget]::Machine)
-        }
+        CreateRipGrepConfig
     }
 }
 
