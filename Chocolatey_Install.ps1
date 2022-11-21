@@ -18,10 +18,21 @@ $config_dev_pkgs = $config_gui_pkgs + @('ripgrep', 'dotnet-6.0-sdk', 'git', 'git
 $config_full_pkgs = $config_dev_pkgs + @('adobereader', 'googledrive', 'lightshot', 'vlc', 'winrar', 'teamspeak', 'discord', 'steam-client', 'firefox', 'ubisoft-connect')
 
 $path_folder = "C:\path"
+
 $ripgrep_bat = "ripg.bat"
-$ripgrep_bat_full_path = $path_folder + "\" + $ripgrep_bat
+$ripgrep_bat_full_path = "$path_folder\$ripgrep_bat"
 $ripgrep_bat_content = '@echo off
     rg -i -B 4 -A 5 -U --glob-case-insensitive %*'
+
+$temp_bat = "temp.bat"
+$temp_bat_full_path = "$path_folder\$temp_bat"
+$temp_bat_content = '@echo off
+if not exist C:\Temp\ (
+    cd C:\
+    mkdir Temp
+)
+
+cd C:\Temp'
 #endregion
 
 
@@ -98,6 +109,18 @@ function CreateRipGrepConfig {
     Write-Host $(Write-Host "Config:" -ForegroundColor Gray) + $(Write-Host $ripgrep_bat_content -ForegroundColor Magenta; Write-Host "")
     
     Set-Content $ripgrep_bat_full_path $ripgrep_bat_content
+}
+
+function CreateTempCmdVariable {
+
+    CreatePathFolder
+    
+    Write-Host "Creating temp cmd variable [$temp_bat_full_path]" -ForegroundColor Gray
+    New-Item $temp_bat_full_path
+    
+    Write-Host $(Write-Host "Config:" -ForegroundColor Gray) + $(Write-Host $temp_bat_content -ForegroundColor Magenta; Write-Host "")
+    
+    Set-Content $temp_bat_full_path $temp_bat_content
 }
 
 function EnableSSMSDarkMode {
@@ -218,6 +241,9 @@ SetWifiAlias
 
 # SSMS settings
 EnableSSMSDarkMode
+
+# Cmd variables
+CreateTempCmdVariable
 
 
 # ================ DONE ================
