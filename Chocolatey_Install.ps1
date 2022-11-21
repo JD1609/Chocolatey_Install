@@ -46,6 +46,8 @@ function VerifyRgInstalled {
             return $true
         }
     }
+
+    return $false
 }
 
 function SetNasAlias {
