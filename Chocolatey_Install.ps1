@@ -48,6 +48,42 @@ function VerifyRgInstalled {
     }
 }
 
+function SetNasAlias {
+    
+    $file = Get-Content -Path C:\Windows\System32\Drivers\etc\hosts
+    $value = "192.168.0.194		nas.local"
+    $contains = $false
+
+    foreach ($row in $file) {
+        if ($row.Contains($value)){
+            $contains = $true
+            break
+        }
+    }
+
+    if (-Not $contains){
+        $value | Out-File -FilePath C:\Windows\System32\Drivers\etc\hosts -Encoding ascii -Append
+    }
+}
+
+function SetWifiAlias {
+    
+    $file = Get-Content -Path C:\Windows\System32\Drivers\etc\hosts
+    $value = "192.168.1.1			wifi.local"
+    $contains = $false
+
+    foreach ($row in $file) {
+        if ($row.Contains($value)){
+            $contains = $true
+            break
+        }
+    }
+
+    if (-Not $contains){
+        $value | Out-File -FilePath C:\Windows\System32\Drivers\etc\hosts -Encoding ascii -Append
+    }
+}
+
 function ShowHelp{
     Write-Host "Core - installs:" -ForegroundColor Green
     Write-Host "====================================" -ForegroundColor Green
@@ -144,6 +180,10 @@ if (VerifyRgInstalled){
         }
     }
 }
+
+# Hosts file
+SetNasAlias
+SetWifiAlias
 
 
 Done
