@@ -9,7 +9,7 @@ if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]:
 
 
 
-#region Configurations
+#region Configs & variables
 $configs = @('core', 'gui', 'dev', 'full')
 
 $config_core_pkgs = @()
@@ -33,6 +33,14 @@ if not exist C:\Temp\ (
 )
 
 cd C:\Temp'
+
+$hosts_file = "C:\Windows\System32\Drivers\etc\hosts"
+
+$wifi_ip = "192.168.0.1"
+$wifi_alias = "wifi.local"
+
+$nas_ip = "192.168.0.194"
+$nas_alias = "nas.local"
 #endregion
 
 
@@ -138,12 +146,10 @@ function EnableSSMSDarkMode {
 
 function SetNasAlias {
     
-    $ip = "192.168.0.194"
-    $alias = "nas.local"
-    Write-Host "Setting '$alias' alias for NAS [$ip]..." -ForegroundColor Gray
+    Write-Host "Setting '$nas_alias' alias for NAS [$nas_ip]..." -ForegroundColor Gray
 
-    $file = Get-Content -Path C:\Windows\System32\Drivers\etc\hosts
-    $value = "$ip		$alias"
+    $file = Get-Content -Path $hosts_file
+    $value = "$nas_ip		$nas_alias"
     $contains = $false
 
     foreach ($row in $file) {
@@ -154,18 +160,16 @@ function SetNasAlias {
     }
 
     if (-Not $contains){
-        $value | Out-File -FilePath C:\Windows\System32\Drivers\etc\hosts -Encoding ascii -Append
+        $value | Out-File -FilePath $hosts_file -Encoding ascii -Append
     }
 }
 
 function SetWifiAlias {
     
-    $ip = "192.168.0.1"
-    $alias = "wifi.local"
-    Write-Host "Setting '$alias' alias for local wifi router [$ip]..." -ForegroundColor Gray
+    Write-Host "Setting '$wifi_alias' alias for local wifi router [$wifi_ip]..." -ForegroundColor Gray
 
-    $file = Get-Content -Path C:\Windows\System32\Drivers\etc\hosts
-    $value = "$ip			$alias"
+    $file = Get-Content -Path $hosts_file
+    $value = "$wifi_ip			$wifi_alias"
     $contains = $false
 
     foreach ($row in $file) {
@@ -176,7 +180,7 @@ function SetWifiAlias {
     }
 
     if (-Not $contains){
-        $value | Out-File -FilePath C:\Windows\System32\Drivers\etc\hosts -Encoding ascii -Append
+        $value | Out-File -FilePath $hosts_file -Encoding ascii -Append
     }
 }
 
