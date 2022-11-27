@@ -160,7 +160,7 @@ function SetNasAlias {
 
 function SetWifiAlias {
     
-    $ip = "192.168.1.1"
+    $ip = "192.168.0.1"
     $alias = "wifi.local"
     Write-Host "Setting '$alias' alias for local wifi router [$ip]..." -ForegroundColor Gray
 
