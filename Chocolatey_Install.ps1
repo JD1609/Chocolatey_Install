@@ -34,6 +34,21 @@ if not exist C:\Temp\ (
 
 cd C:\Temp'
 
+$gitignore_bat = "gi.bat"
+$gitignore_bat_full_path = "$path_folder\$gitignore_bat"
+$gitignore_bat_content = ':: Creates .NET gitignore
+@echo off
+
+dotnet new gitignore
+if  errorlevel 1 goto ERROR
+goto END
+
+:ERROR
+pause
+
+:END
+exit'
+
 $hosts_file = "C:\Windows\System32\Drivers\etc\hosts"
 
 $wifi_ip = "192.168.0.1"
@@ -129,6 +144,18 @@ function CreateTempCmdVariable {
     Write-Host $(Write-Host "Config:" -ForegroundColor Gray) + $(Write-Host $temp_bat_content -ForegroundColor Magenta; Write-Host "")
     
     Set-Content $temp_bat_full_path $temp_bat_content
+}
+
+function CreateGitignoreCmdVariable {
+
+    CreatePathFolder
+    
+    Write-Host "Creating gitignore cmd variable [$gitignore_bat_full_path]" -ForegroundColor Gray
+    New-Item $gitignore_bat_full_path
+    
+    Write-Host $(Write-Host "Config:" -ForegroundColor Gray) + $(Write-Host $gitignore_bat_content -ForegroundColor Magenta; Write-Host "")
+    
+    Set-Content $gitignore_bat_full_path $gitignore_bat_content
 }
 
 function EnableSSMSDarkMode {
@@ -258,6 +285,7 @@ EnableSSMSDarkMode
 
 # Cmd variables
 CreateTempCmdVariable
+CreateGitignoreCmdVariable
 
 
 # ================ DONE ================
