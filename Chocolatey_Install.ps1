@@ -14,7 +14,7 @@ $configs = @('core', 'gui', 'dev', 'full')
 
 $config_core_pkgs = @()
 $config_gui_pkgs = $config_core_pkgs + @('chocolateygui')
-$config_dev_pkgs = $config_gui_pkgs + @('ripgrep', 'dotnet-6.0-sdk', 'git', 'gitkraken', 'visualstudio2022community', 'sql-server-management-studio', 'vscode', 'postman', 'nodejs', 'python', 'docker-desktop')
+$config_dev_pkgs = $config_gui_pkgs + @('ripgrep', 'dotnet-6.0-sdk', 'git', 'gitkraken', 'visualstudio2022community', 'sql-server-management-studio', 'vscode', 'postman', 'nodejs', 'nvm', 'python', 'docker-desktop')
 $config_full_pkgs = $config_dev_pkgs + @('adobereader', 'googledrive', 'lightshot', 'vlc', 'winrar', 'teamspeak', 'discord', 'steam-client', 'firefox', 'ubisoft-connect')
 
 $path_folder = "C:\path"
